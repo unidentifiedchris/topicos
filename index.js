@@ -27,8 +27,6 @@ app.use(
     swaggerUi.serve,
     swaggerUi.setup(specs, { explorer: true })
 );
-app.use(bodyParser.json());
-app.use(require("./routes/jokesroutes"));
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");
