@@ -9,7 +9,7 @@ const DB_USER = process.env.MONGO_USERNAME,
     DB_HOST = process.env.MONGO_HOSTNAME,
     DB_PORT = process.env.MONGO_PORT,
     DB_NAME = process.env.MONGO_DB;
-console.log(DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME);
+
 mongoose.set("strictQuery", false);
 mongoose.connect(`mongodb://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`);
 
