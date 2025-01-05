@@ -1,6 +1,8 @@
 const express = require("express");
 let router = express.Router();
 
+const { ChistePropio } = require("../models/jokeModel");
+
 /**
  * @swagger
  * components:
@@ -43,7 +45,17 @@ let router = express.Router();
  *   description: API Chistes
  */
 
-async function getChuckJoke(params) {
+function chistePropioToJoke(chiste) {
+    return {
+        id: chiste._id.toString(),
+        texto: chiste.texto,
+        author: chiste.author,
+        puntaje: chiste.puntaje,
+        categoria: chiste.categoria,
+    };
+}
+
+async function getChuckJoke() {
     let httpResponse = await fetch("https://api.chucknorris.io/jokes/random");
     let jsonResponse = await httpResponse.json()
     return {
@@ -55,7 +67,7 @@ async function getChuckJoke(params) {
     }
 }
 
-async function getDadJoke(params) {
+async function getDadJoke() {
     let httpResponse = await fetch("https://icanhazdadjoke.com/", {
         headers: {
             "Accept": "application/json"
@@ -71,7 +83,15 @@ async function getDadJoke(params) {
     }
 }
 
-async function getOwnJoke(params) {
+async function getOwnJoke() {
+    try {
+        const chistes = await ChistePropio.aggregate([
+            { $sample: { size: 1 } }
+        ]);
+        return chistes[0];
+    } catch (error) {
+        console.log(error);
+    }
     return null;
 }
 
@@ -91,7 +111,7 @@ async function getOwnJoke(params) {
  *         description: Fuente de chiste
  *     responses:
  *       200:
- *         description: The created book.
+ *         description: Un chiste aleatorio del tipo deseado.
  *         content:
  *           application/json:
  *             schema:
@@ -112,12 +132,73 @@ router.get("/chistes/:tipo", async (req, res) => {
     } else if (tipo === "Propio") {
         const chiste = await getOwnJoke();
         if (chiste) {
-            res.json(chiste);
+            res.json(chistePropioToJoke(chiste));
         } else {
             res.status(422).json({ message: "Aun no hay chistes, cree uno!" });
         }
     } else {
         res.status(400).json({ message: "Tipo de chiste no válido" });
+    }
+});
+
+/**
+ * @swagger
+ * /chistes/propio:
+ *   post:
+ *     summary: Guardar y persistir un chiste propio.
+ *     tags: [Chistes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Chiste'
+ *     responses:
+ *       200:
+ *         description: El chiste subido con su ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Chiste'
+ *       400:
+ *         description: Formato invalido.
+ */
+
+router.post("/chistes/Propio", async (req, res) => {
+    if (!req.body) {
+        res.status(400).json({ message: "Falta el chiste" });
+    }
+
+    const { id, texto, author, puntaje, categoria } = req.body;
+    if (id) {
+        res.status(400).json({ message: "No se puede especificar un ID" });
+    } else if (!texto) {
+        res.status(400).json({ message: "Falta el texto del chiste" });
+    } else if (!puntaje) {
+        res.status(400).json({ message: "Falta el puntaje del chiste" });
+    } else if (puntaje < 1 || puntaje > 10) {
+        res.status(400).json({ message: "Puntaje debe estar entre 1 y 10" });
+    } else if (!categoria) {
+        res.status(400).json({ message: "Falta la categoria del chiste" });
+    } else if (categoria !== "Dad joke" && categoria !== "Humor negro" && categoria !== "Chistoso" && categoria !== "Malo") {
+        res.status(400).json({ message: "Categoria no válida" });
+    } else {
+        let author_a_guardar;
+        if (author) {
+            author_a_guardar = author;
+        } else {
+            author_a_guardar = "Se perdió en el Ávila como Led"
+        }
+
+        const chiste = new ChistePropio({
+            texto: texto,
+            author: author_a_guardar,
+            puntaje: puntaje,
+            categoria: categoria,
+        });
+        await chiste.save();
+
+        res.status(200).json(chistePropioToJoke(chiste));
     }
 });
 
