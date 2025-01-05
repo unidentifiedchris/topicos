@@ -163,7 +163,6 @@ router.get("/chistes/:tipo", async (req, res) => {
  *       400:
  *         description: Formato invalido.
  */
-
 router.post("/chistes/Propio", async (req, res) => {
     if (!req.body) {
         res.status(400).json({ message: "Falta el chiste" });
