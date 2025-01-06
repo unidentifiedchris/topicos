@@ -173,7 +173,7 @@ router.post("/chistes/Propio", async (req, res) => {
         res.status(400).json({ message: "No se puede especificar un ID" });
     } else if (!texto) {
         res.status(400).json({ message: "Falta el texto del chiste" });
-    } else if (!puntaje) {
+    } else if (!puntaje && puntaje !== 0) {
         res.status(400).json({ message: "Falta el puntaje del chiste" });
     } else if (puntaje < 1 || puntaje > 10) {
         res.status(400).json({ message: "Puntaje debe estar entre 1 y 10" });
