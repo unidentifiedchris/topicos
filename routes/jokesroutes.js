@@ -179,7 +179,7 @@ router.post("/chistes/Propio", async (req, res) => {
         res.status(400).json({ message: "Puntaje debe estar entre 1 y 10" });
     } else if (!categoria) {
         res.status(400).json({ message: "Falta la categoria del chiste" });
-    } else if (categoria !== "Dad joke" && categoria !== "Humor negro" && categoria !== "Chistoso" && categoria !== "Malo") {
+    } else if (categoria !== "Dad joke" && categoria !== "Humor Negro" && categoria !== "Chistoso" && categoria !== "Malo") {
         res.status(400).json({ message: "Categoria no válida" });
     } else {
         let author_a_guardar;
