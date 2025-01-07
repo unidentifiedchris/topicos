@@ -204,8 +204,8 @@ router.post("/chistes/Propio", async (req, res) => {
 /**
  * @swagger
  * /chistes/Propio/id/{id}:
- *   delete:
- *     summary: Elimina un chiste propio.
+ *   get:
+ *     summary: Busca un chiste propio por su ID.
  *     tags: [Chistes]
  *     parameters:
  *       - in: path
@@ -213,7 +213,7 @@ router.post("/chistes/Propio", async (req, res) => {
  *         description: Identificador unico del chiste
  *     responses:
  *       200:
- *         description: El chiste fue eliminado.
+ *         description: El chiste correspondiendo a su ID.
  *         content:
  *           application/json:
  *             schema:
