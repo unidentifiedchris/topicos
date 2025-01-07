@@ -270,4 +270,57 @@ router.route("/chistes/Propio/id/:id")
         }
     });
 
+
+/**
+*    /chistes/propio/op/count/ca/{categoria}:
+*   get:
+*      summary: Obtener todos los chistes de una categoría específica
+*      tags: [Chistes]
+*	parameters:
+*        - name: categoria
+*          in: path
+*          required: true
+*          enum: [Dad joke, Humor Negro, Chistoso, Malo]
+*          description: Categoría de los chistes a obtener
+*      responses:
+*        '200':
+*          description: Chistes obtenidos con éxito.
+*          content:
+*            application/json:
+*              schema:
+*              type: integer
+*              description: Cantidad de chistes en la categoría
+*        '400':
+*          description: Categoría de chiste no válida.
+*        '404':
+*           description: No hay chistes en esta categoria.
+*        '500':
+*           description: Error al contar los chistes.
+*/
+router.get("/chistes/Propio/op/count/ca/:categoria", async (req, res) => {
+    const { categoria } = req.params;
+
+    if (!['Dad joke', 'Humor Negro', 'Chistoso', 'Malo'].includes(categoria)) {
+        return res.status(400).json({ message: "Categoria inválida" });
+    }
+    
+    try {
+        const chistes = await ChistePropio.countDocuments({ categoria });
+        
+        if (chistes === 0) {
+            return res.status(404).json({ message: "No hay chistes en esta categoría" });
+        }
+        
+        res.json({ 
+            amount: chistes,
+            message: `Hay ${chistes} chiste${chistes > 1 ? 's' : ''} en esta categoría`
+        });
+        return res.status(200).json({ message: "Cantidad de chistes por categoria encontrados" });
+
+    } catch (error) {
+        console.error('Error al contar los chistes:', error);
+        res.status(500).json({ message: 'Error al contar los chistes', error: error.message });
+    }
+});
+
 module.exports = router;
