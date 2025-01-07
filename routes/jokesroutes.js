@@ -143,7 +143,7 @@ router.get("/chistes/:tipo", async (req, res) => {
 
 /**
  * @swagger
- * /chistes/propio:
+ * /chistes/Propio:
  *   post:
  *     summary: Guardar y persistir un chiste propio.
  *     tags: [Chistes]
@@ -198,6 +198,42 @@ router.post("/chistes/Propio", async (req, res) => {
         await chiste.save();
 
         res.status(200).json(chistePropioToJoke(chiste));
+    }
+});
+
+/**
+ * @swagger
+ * /chistes/Propio/id/{id}:
+ *   delete:
+ *     summary: Elimina un chiste propio.
+ *     tags: [Chistes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Identificador unico del chiste
+ *     responses:
+ *       200:
+ *         description: El chiste fue eliminado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Chiste'
+ *       400:
+ *         description: El chiste no existe.
+ */
+router.get("/chistes/Propio/id/:id", async (req, res) => {
+    const { id } = req.params;
+
+    let chiste;
+    try {
+        chiste = await ChistePropio.findById(id);
+    } catch (error) {
+        console.log(error);
+    }
+    if (chiste) {
+        return res.status(200).json(chistePropioToJoke(chiste));
+    } else {
+        res.status(400).json({ message: "No se puede encontrar el chiste" });
     }
 });
 
