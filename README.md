@@ -25,7 +25,7 @@ Después de que se genera la imagen (su duración depende de la calidad del inte
 Para parar la ejecución presionar `Ctrl`+`C` y correr los siguientes dos comandos (no importa si el último arroja error):
 
 ```bash
-docker compose down --rmi
+docker compose down --rmi all
 docker image rm topicos-web
 ```
 
