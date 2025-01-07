@@ -1,4 +1,5 @@
-const express = require("express");
+const express = require("express"),
+    mongoose = require("mongoose");
 let router = express.Router();
 
 const { ChistePropio } = require("../models/jokeModel");
@@ -220,21 +221,53 @@ router.post("/chistes/Propio", async (req, res) => {
  *               $ref: '#/components/schemas/Chiste'
  *       400:
  *         description: El chiste no existe.
+ *   delete:
+ *     summary: Elimina un chiste propio.
+ *     tags: [Chistes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: Identificador unico del chiste
+ *     responses:
+ *       200:
+ *         description: El chiste fue eliminado.
+ *       400:
+ *         description: El chiste no existe.
  */
-router.get("/chistes/Propio/id/:id", async (req, res) => {
-    const { id } = req.params;
-
-    let chiste;
-    try {
-        chiste = await ChistePropio.findById(id);
-    } catch (error) {
-        console.log(error);
-    }
-    if (chiste) {
-        return res.status(200).json(chistePropioToJoke(chiste));
-    } else {
-        res.status(400).json({ message: "No se puede encontrar el chiste" });
-    }
-});
+router.route("/chistes/Propio/id/:id")
+    .get(async (req, res) => {
+        const { id } = req.params;
+    
+        let chiste;
+        try {
+            if (mongoose.Types.ObjectId.isValid(id)) {
+                chiste = await ChistePropio.findById(id);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        if (chiste) {
+            return res.status(200).json(chistePropioToJoke(chiste));
+        } else {
+            res.status(400).json({ message: "No se puede encontrar el chiste" });
+        }
+    })
+    .delete(async (req, res) => {
+        const { id } = req.params;
+    
+        let chiste;
+        try {
+            if (mongoose.Types.ObjectId.isValid(id)) {
+                chiste = await ChistePropio.findByIdAndDelete(id);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        if (chiste) {
+            return res.status(200).end();
+        } else {
+            res.status(400).json({ message: "No se puede encontrar el chiste" });
+        }
+    });
 
 module.exports = router;
