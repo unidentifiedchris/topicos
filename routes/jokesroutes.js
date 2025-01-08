@@ -324,4 +324,61 @@ router.get("/chistes/Propio/op/count/ca/:categoria", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /chistes/Propio/op/all/pu/{puntaje}:
+ *   get:
+ *     summary: Obtener todos los chistes con un puntaje específico
+ *     tags: [Chistes]
+ *     parameters:
+ *       - in: path
+ *         name: puntaje
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 10
+ *         description: Puntaje de los chistes a obtener
+ *     responses:
+ *       200:
+ *         description: Lista de chistes con el puntaje especificado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - result
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Chiste'
+ *       400:
+ *         description: Puntaje no válido o no hay chistes con el puntaje especificado.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+
+router.get("/chistes/Propio/op/all/pu/:puntaje", async (req, res) => {
+    const { puntaje } = req.params;
+
+    if (puntaje < 1 || puntaje > 10) {
+        return res.status(400).json({ message: "Puntaje debe estar entre 1 y 10" });
+    }
+
+    try {
+        const jokes = await ChistePropio.find({ puntaje: parseInt(puntaje, 10) });
+
+        if (jokes.length === 0) {
+            return res.status(400).json({ message: "No hay chistes con el puntaje especificado" });
+        }
+
+        res.status(200).json({ result: jokes.map(chistePropioToJoke) });
+    } catch (error) {
+        console.error("Error fetching jokes by score:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+});
+
+
 module.exports = router;
