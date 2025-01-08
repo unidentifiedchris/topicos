@@ -606,13 +606,13 @@ describe("GET /chistes/Propio/op/count/ca/:categoria", () => {
         expect(response.body.result).toEqual(50);
     });
     it("debe retornar 400 para categoria invalida", async () => {
-        let response = await request.get("/chistes/Propio/op/count/ca/1n\\/vI1D0");
+        let response = await request.get("/chistes/Propio/op/count/ca/invalido");
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("message");
         expect(response.body.message).toEqual("Categoria no válida");
     });
     it("debe retornar 400 para Dj (no hay chistes de tipo Dad joke)", async () => {
-        let response = await request.get("/chistes/Propio/op/count/ca/Dad joke");
+        let response = await request.get("/chistes/Propio/op/count/ca/Dad%20joke");
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("message");
         expect(response.body.message).toEqual("No hay chistes con la categoria especificada");
@@ -683,53 +683,3 @@ describe("GET /chistes/Propio/op/all/pu/:puntaje", () => {
         expect(response.body.message).toEqual("No hay chistes con el puntaje especificado");
     });
 });
-
-describe("GET /chistes/Propio/op/all/pu/:puntaje", () => {
-    beforeAll(async () => {
-        await connectToDatabase();
-        await dropDatabase();
-        
-        for (let i = 1; i <= 10; i++) {
-            await request.post("/chistes/Propio").send({
-                "texto": `Chiste con puntaje ${i}`,
-                "author": "Autor",
-                "puntaje": i,
-                "categoria": "Chistoso"
-            });
-        }
-    });
-
-    afterAll(async () => {
-        await dropDatabase();
-        await disconnectFromDatabase();
-    });
-
-    it("debe retornar 200 OK para puntaje válido", async () => {
-        const puntaje = 5;
-        const response = await request.get(`/chistes/Propio/op/all/pu/${puntaje}`);
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty("result");
-        expect(response.body.result.length).toBe(1);
-        expect(response.body.result[0]).toHaveProperty("texto", `Chiste con puntaje ${puntaje}`);
-    });
-
-    it("debe retornar 400 para puntaje < 1", async () => {
-        const response = await request.get("/chistes/Propio/op/all/pu/0");
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty("message", "Puntaje debe estar entre 1 y 10");
-    });
-
-    it("debe retornar 400 para puntaje > 10", async () => {
-        const response = await request.get("/chistes/Propio/op/all/pu/11");
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty("message", "Puntaje debe estar entre 1 y 10");
-    });
-
-    it("debe retornar 400 para puntaje sin chistes", async () => {
-        const puntaje = 8; // Assuming no jokes with score 8
-        const response = await request.get(`/chistes/Propio/op/all/pu/${puntaje}`);
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty("message", "No hay chistes con el puntaje especificado");
-    });
-});
-
