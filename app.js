@@ -28,6 +28,6 @@ app.use(
     swaggerUi.setup(specs, { explorer: true })
 );
 app.use(bodyParser.json());
-app.use(require("./routes/jokesroutes"));
+app.use(require("./routes/jokesRoutes"));
 
 module.exports = app;
