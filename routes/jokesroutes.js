@@ -201,4 +201,83 @@ router.post("/chistes/Propio", async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /chistes/Propio/id/{id}:
+ *   put:
+ *     summary: Actualizar un chiste existente.
+ *     tags: [Chistes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del chiste a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               texto:
+ *                 type: string
+ *               author:
+ *                 type: string
+ *               puntaje:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 10
+ *               categoria:
+ *                 type: string
+ *                 enum: [Dad joke, Humor Negro, Chistoso, Malo]
+ *     responses:
+ *       200:
+ *         description: Chiste actualizado con éxito.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Chiste'
+ *       400:
+ *         description: Datos inválidos o ID no encontrado.
+ */
+router.put("/chistes/Propio/id/:id", async (req, res) => {
+    const { id } = req.params;
+    const { texto, author, puntaje, categoria } = req.body;
+
+    try {
+        // Validate puntaje
+        if (puntaje !== undefined && (puntaje < 1 || puntaje > 10)) {
+            return res.status(400).json({ message: "Puntaje debe estar entre 1 y 10" });
+        }
+
+        // Validate categoria
+        if (categoria && !["Dad joke", "Humor Negro", "Chistoso", "Malo"].includes(categoria)) {
+            return res.status(400).json({ message: "Categoria no válida" });
+        }
+
+        // Prevent updates to ID
+        if (req.body.id) {
+            return res.status(400).json({ message: "No se puede especificar un ID" });
+        }
+
+        // Update the joke
+        const updatedJoke = await ChistePropio.findByIdAndUpdate(
+            id,
+            { texto, author, puntaje, categoria },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedJoke) {
+            return res.status(404).json({ message: "No se puede encontrar el chiste" });
+        }
+
+        res.status(200).json(chistePropioToJoke(updatedJoke));
+    } catch (error) {
+        console.error("Error updating joke:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+});
+
 module.exports = router;
