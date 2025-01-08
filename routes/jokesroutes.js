@@ -219,19 +219,7 @@ router.post("/chistes/Propio", async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               texto:
- *                 type: string
- *               author:
- *                 type: string
- *               puntaje:
- *                 type: integer
- *                 minimum: 1
- *                 maximum: 10
- *               categoria:
- *                 type: string
- *                 enum: [Dad joke, Humor Negro, Chistoso, Malo]
+ *             $ref: '#/components/schemas/Chiste'
  *     responses:
  *       200:
  *         description: Chiste actualizado con éxito.
