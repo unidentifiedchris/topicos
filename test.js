@@ -38,25 +38,6 @@ const app = require("./app");
 const supertest = require("supertest");
 const request = supertest(app);
 
-// async function seedDatabase() {
-//     const jokes = [
-//         { texto: "Joke 1", author: "Author 1", puntaje: 1, categoria: "Malo" },
-//         { texto: "Joke 2", author: "Author 2", puntaje: 5, categoria: "Chistoso" },
-//         { texto: "Joke 3", author: "Author 3", puntaje: 10, categoria: "Humor Negro" }
-//     ];
-
-//     try {
-//         await ChistePropio.insertMany(jokes);
-//         console.log("Database seeded successfully!");
-//     } catch (error) {
-//         console.error("Error seeding database:", error);
-//     } finally {
-//         mongoose.connection.close();
-//     }
-// }
-
-// seedDatabase();
-
 describe("GET /chistes/:tipo", () => {
     beforeAll(async () => {
         await connectToDatabase();
