@@ -247,7 +247,7 @@ router.route("/chistes/Propio/id/:id")
             console.log(error);
         }
         if (chiste) {
-            return res.status(200).json(chistePropioToJoke(chiste));
+            res.status(200).json(chistePropioToJoke(chiste));
         } else {
             res.status(400).json({ message: "No se puede encontrar el chiste" });
         }
@@ -264,10 +264,64 @@ router.route("/chistes/Propio/id/:id")
             console.log(error);
         }
         if (chiste) {
-            return res.status(200).end();
+            res.status(200).end();
         } else {
             res.status(400).json({ message: "No se puede encontrar el chiste" });
         }
     });
+
+
+/**
+ * @swagger
+ * /chistes/Propio/op/count/ca/{categoria}:
+ *   get:
+ *      summary: Obtener todos los chistes de una categoría específica
+ *      tags: [Chistes]
+ *      parameters:
+ *        - name: categoria
+ *          in: path
+ *          required: true
+ *          enum: [Dad joke, Humor Negro, Chistoso, Malo]
+ *          description: Categoría de los chistes a obtener
+ *      responses:
+ *        200:
+ *          description: Chistes obtenidos con éxito.
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                required:
+ *                  - result
+ *                properties:
+ *                  result:
+ *                    type: integer
+ *                    minimum: 1
+ *                    description: Cantidad de chistes en la categoría
+ *        400:
+ *          description: No hay chistes en la categoria.
+ *        500:
+ *          description: Error al contar los chistes.
+ */
+router.get("/chistes/Propio/op/count/ca/:categoria", async (req, res) => {
+    const { categoria } = req.params;
+
+    if (!['Dad joke', 'Humor Negro', 'Chistoso', 'Malo'].includes(categoria)) {
+        res.status(400).json({ message: "Categoria no válida" });
+        return
+    }
+    
+    try {
+        const chistes = await ChistePropio.countDocuments({ categoria });
+        
+        if (chistes === 0) {
+            res.status(400).json({ message: "No hay chistes con la categoria especificada" });
+        } else {
+            res.status(200).json({ result: chistes });
+        }
+    } catch (error) {
+        console.error('Error al contar los chistes:', error);
+        res.status(500).json({ message: 'Error al contar los chistes'});
+    }
+});
 
 module.exports = router;

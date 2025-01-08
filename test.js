@@ -606,13 +606,13 @@ describe("GET /chistes/Propio/op/count/ca/:categoria", () => {
         expect(response.body.result).toEqual(50);
     });
     it("debe retornar 400 para categoria invalida", async () => {
-        let response = await request.get("/chistes/Propio/op/count/ca/1n\\/vI1D0");
+        let response = await request.get("/chistes/Propio/op/count/ca/invalido");
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("message");
         expect(response.body.message).toEqual("Categoria no válida");
     });
     it("debe retornar 400 para Dj (no hay chistes de tipo Dad joke)", async () => {
-        let response = await request.get("/chistes/Propio/op/count/ca/Dad joke");
+        let response = await request.get("/chistes/Propio/op/count/ca/Dad%20joke");
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("message");
         expect(response.body.message).toEqual("No hay chistes con la categoria especificada");
