@@ -263,14 +263,17 @@ router.put("/chistes/Propio/id/:id", async (req, res) => {
         }
 
         // Update the joke
-        const updatedJoke = await ChistePropio.findByIdAndUpdate(
-            id,
-            { texto, author, puntaje, categoria },
-            { new: true, runValidators: true }
-        );
+        let updatedJoke;
+        if (mongoose.Types.ObjectId.isValid(id)) {
+            updatedJoke = await ChistePropio.findByIdAndUpdate(
+                id,
+                { texto, author, puntaje, categoria },
+                { new: true, runValidators: true }
+            );
+        }
 
         if (!updatedJoke) {
-            return res.status(404).json({ message: "No se puede encontrar el chiste" });
+            return res.status(400).json({ message: "No se puede encontrar el chiste" });
         }
 
         res.status(200).json(chistePropioToJoke(updatedJoke));
