@@ -9,7 +9,7 @@ const options = {
         openapi: "3.1.0",
         info: {
             title: "ApiChistes",
-            version: "0.1.0",
+            version: "1.0.0",
             description: "Proyecto TEP",
         },
         servers: [
