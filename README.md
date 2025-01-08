@@ -2,9 +2,9 @@
 Proyecto de Tópicos Especiales de Programación
 
 Integrantes:
-- Christopher Acosta
-- Hugo Cuenca
-- Israel Mejias
+- Christopher Acosta ([unidentifiedchris](https://github.com/unidentifiedchris))
+- Hugo Cuenca ([haucab](https://github.com/haucab))
+- Israel Mejias ([highwir3](https://github.com/highwir3), israelmejias)
 
 ## Prerequisitos para correr
 - Docker
