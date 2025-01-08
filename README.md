@@ -1,2 +1,0 @@
-# topicos
-Proyecto Topicos
