@@ -1,4 +1,5 @@
-const express = require("express");
+const express = require("express"),
+    mongoose = require("mongoose");
 let router = express.Router();
 
 const { ChistePropio } = require("../models/jokeModel");
@@ -143,7 +144,7 @@ router.get("/chistes/:tipo", async (req, res) => {
 
 /**
  * @swagger
- * /chistes/propio:
+ * /chistes/Propio:
  *   post:
  *     summary: Guardar y persistir un chiste propio.
  *     tags: [Chistes]
@@ -258,12 +259,41 @@ router.post("/chistes/Propio", async (req, res) => {
  *       400:
  *         description: Datos inválidos o ID no encontrado.
  */
+
 router.route("/chistes/Propio/id/:id")
     .get(async (req, res) => {
-        throw new Error("Not implemented");
+        const { id } = req.params;
+    
+        let chiste;
+        try {
+            if (mongoose.Types.ObjectId.isValid(id)) {
+                chiste = await ChistePropio.findById(id);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        if (chiste) {
+            res.status(200).json(chistePropioToJoke(chiste));
+        } else {
+            res.status(400).json({ message: "No se puede encontrar el chiste" });
+        }
     })
     .delete(async (req, res) => {
-        throw new Error("Not implemented");
+        const { id } = req.params;
+    
+        let chiste;
+        try {
+            if (mongoose.Types.ObjectId.isValid(id)) {
+                chiste = await ChistePropio.findByIdAndDelete(id);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        if (chiste) {
+            res.status(200).end();
+        } else {
+            res.status(400).json({ message: "No se puede encontrar el chiste" });
+        }
     })
     .put(async (req, res) => {
         const { id } = req.params;
@@ -305,5 +335,58 @@ router.route("/chistes/Propio/id/:id")
             res.status(500).json({ message: "Error interno del servidor" });
         }
     });
+
+/**
+ * @swagger
+ * /chistes/Propio/op/count/ca/{categoria}:
+ *   get:
+ *      summary: Obtener todos los chistes de una categoría específica
+ *      tags: [Chistes]
+ *      parameters:
+ *        - name: categoria
+ *          in: path
+ *          required: true
+ *          enum: [Dad joke, Humor Negro, Chistoso, Malo]
+ *          description: Categoría de los chistes a obtener
+ *      responses:
+ *        200:
+ *          description: Chistes obtenidos con éxito.
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                required:
+ *                  - result
+ *                properties:
+ *                  result:
+ *                    type: integer
+ *                    minimum: 1
+ *                    description: Cantidad de chistes en la categoría
+ *        400:
+ *          description: No hay chistes en la categoria.
+ *        500:
+ *          description: Error al contar los chistes.
+ */
+router.get("/chistes/Propio/op/count/ca/:categoria", async (req, res) => {
+    const { categoria } = req.params;
+
+    if (!['Dad joke', 'Humor Negro', 'Chistoso', 'Malo'].includes(categoria)) {
+        res.status(400).json({ message: "Categoria no válida" });
+        return
+    }
+    
+    try {
+        const chistes = await ChistePropio.countDocuments({ categoria });
+        
+        if (chistes === 0) {
+            res.status(400).json({ message: "No hay chistes con la categoria especificada" });
+        } else {
+            res.status(200).json({ result: chistes });
+        }
+    } catch (error) {
+        console.error('Error al contar los chistes:', error);
+        res.status(500).json({ message: 'Error al contar los chistes'});
+    }
+});
 
 module.exports = router;
